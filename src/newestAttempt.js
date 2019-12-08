@@ -2,8 +2,9 @@ import React, { useEffect, useState, Fragment } from 'react';
 import './App.css';
 import openSocket from 'socket.io-client';
 import UserList from './components/UserList'
+const port = process.env.PORT || 8000;
 
-var socket = openSocket('http://localhost:8000');
+var socket = openSocket(`ws://${window.location.hostname}:${port}`);
 var peerConnection
 var myStream
 var localVideo
