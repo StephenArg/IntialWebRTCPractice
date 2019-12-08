@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, Fragment } from 'react';
 import './App.css';
 import openSocket from 'socket.io-client';
 import UserList from './components/UserList'
@@ -21,6 +21,7 @@ function App() {
     const [myID, setMyID] = useState(null)
     const [users, setUsers] = useState([])
     const [myLocation, setMyLocation] = useState(null)
+    const [showTextInput, setShowTextInput] = useState(false)
     const [streamInitialized, setStreamInitialized] = useState(false)
     const [readyToInitialize, setReadyToInitialize] = useState(false)
 
@@ -91,6 +92,7 @@ function App() {
                 peerConnection.setRemoteDescription(data)
                 document.getElementById('otherID').value = JSON.stringify(data)
                 console.log(peerConnection)
+                setShowTextInput(true)
                 // setStreamInitialized(true)
             })
 
@@ -102,12 +104,6 @@ function App() {
             })
         }
     }, [myID])
-
-    // useEffect(() => {
-    //     if (streamInitialized) {
-    //         peerConnection.ontrack = receivedStream
-    //     }
-    // }, [streamInitialized])
 
     const handleUserClick = async(e) => {
         const tempTargetUser = e.target.innerText
@@ -206,6 +202,7 @@ function App() {
         dataChannel = event.channel
         dataChannel.onopen = () => {console.log("DataChannel Open")}
         dataChannel.onmessage = dataChannelMessage
+        setShowTextInput(true)
     }
 
     return (
@@ -222,10 +219,15 @@ function App() {
             <video id="theirVideo" autoPlay></video>
             <br></br>
             <br></br>
+            { showTextInput ? 
+            <Fragment>
             <label>Enter message</label><br />
-            <textarea id="yourMessage" onKeyUp={handleTextAreaEnter}></textarea>
+            <input id="yourMessage" type="text" style={{width: 190, height: 25, fontSize: 16}} onKeyUp={handleTextAreaEnter}></input>
             <button id="send" onClick={sendTextMessage}>Send</button>
             <pre id="messages" style={{maxHeight: 150, overflowY: "scroll"}}></pre> <br />
+            </Fragment>
+            : null
+            }
             
             <label>Your ID:</label><br />
             <textarea id="yourID"></textarea><br />
