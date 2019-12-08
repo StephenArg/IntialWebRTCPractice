@@ -12,11 +12,7 @@ function App() {
   const [streamInitialized, setStreamInitialized] = useState(false)
   const [readyToInitialize, setReadyToInitialize] = useState(false)
   const [targetUser, setTargetUser] = useState(null)
-  const [peer, setPeer] = useState(new Peer({
-    initiator: false,
-    trickle: false,
-    stream: null
-  }))
+  const [peer, setPeer] = useState(null)
 
 
   useEffect(() => {
@@ -26,58 +22,24 @@ function App() {
       setUsers(data.users)
     })
 
+    if (hasUserMedia()) { 
+      navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia
+      || navigator.mozGetUserMedia
+    } else { 
+        alert("WebRTC is not supported"); 
+    }
+    
+    navigator.getUserMedia({ video: true, audio: true }, function (stream) { 
+        setStream(stream)
+      }, function (err) {console.error(err)})
+
   }, [])
 
   useEffect(() => {
-    if(myID){
-      socket.on('new_person', data => {
-        setUsers(data.filter((userID => {
-          return userID !== myID
-        })))
-      })
-  
-      socket.on('remove_user', (data) => {
-        setUsers(data.filter((userID => {
-          return userID !== myID
-        })))
-      })
-
-      socket.on('incoming_offer', (data) => {
-        console.log(`Incoming offer from ${data.offersID}: ${JSON.stringify(data.offer)}`)
-        document.getElementById('otherID').value = JSON.stringify(data.offer)
-        // generate peerconnection. enter offer into remoteDescription. send back answer
-        setTargetUser(data.offersID)
-        setReadyToInitialize(true)
-        if (hasUserMedia()) { 
-          navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia
-          || navigator.mozGetUserMedia
-        } else { 
-            alert("WebRTC is not supported"); 
-        }
-        
-        navigator.getUserMedia({ video: true, audio: true }, function (stream) { 
-            setStream(stream, false)
-          }, function (err) {console.error(err)})
-
-        
-        peer.signal(data.offer)
-        
-      })
-
-      socket.on('incoming_answer', function(data){
-        console.log(`Incoming answer: ${JSON.stringify(data)}`)
-        document.getElementById('otherID').value = JSON.stringify(data)
-      })
-
-    }
-    // eslint-disable-next-line
-  }, [myID])
-
-  useEffect(() => {
     if (peer && !streamInitialized && readyToInitialize) {
-
+      console.log("withinEffect")
       peer.on('signal', function(data){
-        console.log(data)
+        console.log("working", data)
         if (data.type === 'offer') {
           socket.emit('offer_to_user', {
             targetUser: targetUser,
@@ -118,12 +80,49 @@ function App() {
     // eslint-disable-next-line
   }, [peer, streamInitialized, readyToInitialize])
 
+  useEffect(() => {
+    if(myID){
+      socket.on('new_person', data => {
+        setUsers(data.filter((userID => {
+          return userID !== myID
+        })))
+      })
+  
+      socket.on('remove_user', (data) => {
+        setUsers(data.filter((userID => {
+          return userID !== myID
+        })))
+      })
+
+      if(peer) {
+      socket.on('incoming_offer', (data) => {
+        console.log(`Incoming offer from ${data.offersID}: ${JSON.stringify(data.offer)} :: ${peer}`)
+        document.getElementById('otherID').value = JSON.stringify(data.offer)
+        // generate peerconnection. enter offer into remoteDescription. send back answer
+        setTargetUser(data.offersID)
+
+        
+        peer.signal(data.offer)
+        
+        })
+      }
+
+      socket.on('incoming_answer', function(data){
+        console.log(`Incoming answer: ${JSON.stringify(data)}`)
+        document.getElementById('otherID').value = JSON.stringify(data)
+      })
+
+    }
+    // eslint-disable-next-line
+  }, [myID, peer, streamInitialized])
+
   const showUsers = () => {
     console.log(users)
   }
 
   const handleUserClick = async(e) => {
-
+    setPeer(null)
+    setStreamInitialized(false)
     setTargetUser(e.target.innerText)
 
     if (hasUserMedia()) { 
@@ -134,7 +133,7 @@ function App() {
     }
   
     navigator.getUserMedia({ video: true, audio: true }, function (stream) { 
-        setStream(stream)
+        setStream(stream, true)
       }, function (err) {console.error(err)})
     
   }
@@ -145,21 +144,13 @@ function App() {
        navigator.mozGetUserMedia); 
   } 
 
-  const setStream = (stream, initiate = true) => {
+  const setStream = (stream, initiate=false) => {
 
-    if(initiate) {
-      let newPeer = new Peer({
+      setPeer(new Peer({
         initiator: initiate,
         trickle: false,
         stream: stream
-      })
-      newPeer.stream = stream
-      setPeer(newPeer)
-    } else {
-      peer.stream = stream
-      peer.streams = [stream]
-      setPeer(peer)
-    }
+      }))
 
     let video = document.getElementById('myVideo'); 
     video.width = 500
@@ -172,7 +163,6 @@ function App() {
     setReadyToInitialize(true)
   }
 
-  console.log("peer", peer)
 
   return (
     <div className="App">
