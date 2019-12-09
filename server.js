@@ -1,6 +1,13 @@
-// var express = require('express')
-var io = require('socket.io')()
+var path = require('path')
+var express = require('express')
+var app = express()
+var server = require('http').createServer(app)
+
+var io = require('socket.io')(server)
 const port = process.env.PORT || 8000;
+
+
+app.use(express.static(path.join(__dirname, './build')))
 
 // var app = express()
 // var server = app.listen(port, function(){
@@ -9,8 +16,12 @@ const port = process.env.PORT || 8000;
 
 // var io = socket(server)
 
-io.listen(port);
-console.log('listening on port ', port);
+// io.listen(port);
+
+app.get('/', (req, res, next) => {
+    console.log("here")
+    res.sendFile(__dirname, './index.html')
+})
 
 var users = []
 
@@ -47,3 +58,6 @@ io.on('connection', (client) => {
         console.log("websocket disconnected: " + client.id)
     })
   });
+
+server.listen(port)
+console.log('listening on port ', port);
