@@ -4,6 +4,7 @@ import openSocket from 'socket.io-client';
 import UserList from './components/UserList'
 const port = process.env.PORT || 8000;
 
+console.log(`ws://${window.location.hostname}:${port}`)
 var socket = openSocket(`ws://${window.location.hostname}:${port}`);
 var peerConnection
 var myStream
@@ -37,6 +38,7 @@ function App() {
             setMyLocation(location)})
 
         socket.on('get_id', data => {
+            console.log("Connected to websocket")
             setMyID(data.myID)
             setUsers(data.users)
         })
