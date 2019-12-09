@@ -156,7 +156,7 @@ function App() {
     const handleTextAreaEnter = (event) => {
         if (event.key === "Enter") {
             const textarea = document.getElementById('yourMessage')
-            textarea.value = textarea.value.slice(0,-1)
+            textarea.value = textarea.value
             sendTextMessage()
         }
     }
