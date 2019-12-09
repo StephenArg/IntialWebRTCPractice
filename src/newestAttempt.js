@@ -5,7 +5,7 @@ import UserList from './components/UserList'
 // const port = process.env.PORT || 8000;
 
 // console.log(`ws://${window.location.hostname}:${port}`)
-var socket = openSocket(location.origin.replace(/^http/, 'ws'));
+var socket = openSocket(window.location.origin.replace(/^http/, 'ws'));
 var peerConnection
 var myStream
 var localVideo
