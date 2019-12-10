@@ -36,12 +36,12 @@ io.on('connection', (client) => {
 
     client.on('offer_to_user', function(data){
         console.log(data)
-        client.broadcast.to(data.targetUser).emit('incoming_offer', {offersID: data.myID, offer: data.offer})
+        client.broadcast.to(data.targetUser).emit('incoming_offer', {offersID: data.myID, offer: data.offer, location: data.location})
     })
 
     client.on('answer_to_user', function(data){
         console.log("answer", data)
-        client.broadcast.to(data.targetUser).emit('incoming_answer', data.answer)
+        client.broadcast.to(data.targetUser).emit('incoming_answer', {answer: data.answer, location: data.location})
     })
 
     client.on('candidate', function(data){

@@ -18,11 +18,12 @@ var pcConfig = {
   };
 var targetUser
 var dataChannel
+var myLocation
 
 function App() {
     const [myID, setMyID] = useState(null)
     const [users, setUsers] = useState([])
-    const [myLocation, setMyLocation] = useState(null)
+    const [remoteLocation, setRemoteLocation] = useState(null)
     const [showTextInput, setShowTextInput] = useState(false)
     const [streamInitialized, setStreamInitialized] = useState(false)
     const [readyToInitialize, setReadyToInitialize] = useState(false)
@@ -35,7 +36,7 @@ function App() {
         .then(data => {
             console.log(data)
             const location = data.state ? `${data.state}, ${data.country_name}` : `${data.country_name}`
-            setMyLocation(location)})
+            myLocation = location})
 
         socket.on('get_id', data => {
             console.log("Connected to websocket")
@@ -61,7 +62,9 @@ function App() {
 
             socket.on('incoming_offer', async(data) => {
                 console.log(`Incoming offer from ${data.offersID}: ${JSON.stringify(data.offer)}`)
+                console.log(data)
                 targetUser = data.offersID
+                setRemoteLocation(data.location)
 
                 myStream = await navigator.mediaDevices.getUserMedia({video: true, audio: true});
                 setStream()
@@ -81,7 +84,8 @@ function App() {
                     peerConnection.setLocalDescription(answer)
                     socket.emit('answer_to_user', {
                         targetUser: data.offersID,
-                        answer: answer
+                        answer: answer,
+                        location: myLocation
                     })
                     document.getElementById('yourID').value = JSON.stringify(answer)
                 })
@@ -91,9 +95,11 @@ function App() {
             })
 
             socket.on('incoming_answer', function (data) {
-                console.log(`Incoming answer: ${JSON.stringify(data)}`)
-                peerConnection.setRemoteDescription(data)
-                document.getElementById('otherID').value = JSON.stringify(data)
+                console.log(data)
+                setRemoteLocation(data.location)
+                console.log(`Incoming answer: ${JSON.stringify(data.answer)}`)
+                peerConnection.setRemoteDescription(data.answer)
+                document.getElementById('otherID').value = JSON.stringify(data.answer)
                 console.log(peerConnection)
                 setShowTextInput(true)
                 // setStreamInitialized(true)
@@ -130,7 +136,8 @@ function App() {
             socket.emit('offer_to_user', {
                 targetUser: tempTargetUser,
                 myID: myID,
-                offer: offer
+                offer: offer,
+                location: myLocation
             })
             document.getElementById('yourID').value = JSON.stringify(offer)
         })
@@ -215,7 +222,12 @@ function App() {
 
             <button >Users</button><br />
             
-            <strong>{myLocation}</strong><br/>
+            {remoteLocation && targetUser ? 
+            <Fragment>
+                <strong id="remote-user">Connected to: {targetUser}</strong><br/>
+                <strong id="remote-location">Location: {remoteLocation}</strong><br/>
+            </Fragment> : null
+            }
 
             <video id="myVideo" autoPlay></video>
             <spacer type="block"> </spacer>
