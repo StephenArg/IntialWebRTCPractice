@@ -103,7 +103,7 @@ function App() {
                 setShowTextInput(true)
                 setTimeout(() => {
                     allowRenegotionation = true
-                }, 2000)
+                }, 10000)
                 // setStreamInitialized(true)
             })
 
@@ -176,7 +176,7 @@ function App() {
             })
             setTimeout(() => {
                 allowRenegotionation = true
-            }, 2000)
+            }, 10000)
         }
     } 
 
