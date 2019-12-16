@@ -21,7 +21,7 @@ var constraints = { video: true, audio: true };
 var targetUser
 var dataChannel
 var myLocation
-var allowRenegotionation = false
+// var allowRenegotionation = false
 
 function App() {
     const [myID, setMyID] = useState(null)
@@ -29,7 +29,7 @@ function App() {
     const [remoteLocation, setRemoteLocation] = useState(null)
     const [showTextInput, setShowTextInput] = useState(false)
     const [screenShareBtnText, setScreenShareBtnText] = useState("Start ScreenShare")
-    // const [allowRenegotionation, setAllowRenegotiation] = useState(false)
+    var [allowRenegotionation, setAllowRenegotiation] = useState(false)
     const [streamInitialized, setStreamInitialized] = useState(false)
     const [readyToInitialize, setReadyToInitialize] = useState(false)
 
@@ -102,7 +102,7 @@ function App() {
                 console.log(peerConnection)
                 setShowTextInput(true)
                 setTimeout(() => {
-                    allowRenegotionation = true
+                    setAllowRenegotiation(true)
                 }, 3000)
                 // setStreamInitialized(true)
             })
@@ -175,7 +175,7 @@ function App() {
                 document.getElementById('yourID').value = JSON.stringify(answer)
             })
             setTimeout(() => {
-                allowRenegotionation = true
+                setAllowRenegotiation(true)
             }, 3000)
         }
     } 
