@@ -21,7 +21,7 @@ var constraints = { video: true, audio: true };
 var targetUser
 var dataChannel
 var myLocation
-// var allowRenegotionation = false
+var allowRenegotionationOutsideVar = false
 
 function App() {
     const [myID, setMyID] = useState(null)
@@ -130,15 +130,21 @@ function App() {
         }
     }, [myID])
 
+    useEffect(() => {
+        if (allowRenegotionation) {
+            allowRenegotionationOutsideVar = true
+        }
+    }, [allowRenegotionation])
+
     const generateOffer = (renegotiation = false, data = false) => {
         let socketRoute
-        if (renegotiation && allowRenegotionation) {
+        if (renegotiation && allowRenegotionationOutsideVar) {
             socketRoute = 'renegotiation_offer_to_user'
         } else if (!renegotiation) {
             socketRoute = 'offer_to_user'
         }
 
-        console.log("genOffer", renegotiation, allowRenegotionation, socketRoute)
+        console.log("genOffer", renegotiation, allowRenegotionationOutsideVar, socketRoute)
 
         if (socketRoute) {
             peerConnection.createOffer().then((offer) => {
@@ -156,13 +162,13 @@ function App() {
 
     const generateAnswer = (renegotiation = false, data = false) => {
         let socketRoute
-        if (renegotiation && allowRenegotionation) {
+        if (renegotiation && allowRenegotionationOutsideVar) {
             socketRoute = 'renegotiation_answer_to_user'
         } else if (!renegotiation) {
             socketRoute = 'answer_to_user'
         }
 
-        console.log("genAnswer", renegotiation, allowRenegotionation, socketRoute)
+        console.log("genAnswer", renegotiation, allowRenegotionationOutsideVar, socketRoute)
 
         if (socketRoute) {
             peerConnection.createAnswer().then((answer) => {
