@@ -103,7 +103,7 @@ function App() {
                 setShowTextInput(true)
                 setTimeout(() => {
                     allowRenegotionation = true
-                }, 10000)
+                }, 3000)
                 // setStreamInitialized(true)
             })
 
@@ -176,7 +176,7 @@ function App() {
             })
             setTimeout(() => {
                 allowRenegotionation = true
-            }, 10000)
+            }, 3000)
         }
     } 
 
@@ -343,7 +343,7 @@ function App() {
 
             {users.length > 0 ? <UserList users={users} handleUserClick={handleUserClick}></UserList> : null}
 
-            <button onClick={handleScreenShare}>{screenShareBtnText}</button><br />
+            {allowRenegotionation ? <button onClick={handleScreenShare}>{screenShareBtnText}</button> : <button>Welcome!</button>}<br/>
             
             {remoteLocation && targetUser ? 
             <Fragment>
