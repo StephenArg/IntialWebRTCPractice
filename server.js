@@ -35,18 +35,28 @@ io.on('connection', (client) => {
 
 
     client.on('offer_to_user', function(data){
-        console.log(data)
+        console.log("\noffer", data)
         client.broadcast.to(data.targetUser).emit('incoming_offer', {offersID: data.myID, offer: data.offer, location: data.location})
     })
 
     client.on('answer_to_user', function(data){
-        console.log("answer", data)
+        console.log("\nanswer", data)
         client.broadcast.to(data.targetUser).emit('incoming_answer', {answer: data.answer, location: data.location})
     })
 
     client.on('candidate', function(data){
-        console.log("candidate", data.candidate, data.targetUser)
+        console.log(`\ncandidate`, data.candidate, data.targetUser)
         client.broadcast.to(data.targetUser).emit('incoming_candidate', data.candidate)
+    })
+
+    client.on('renegotiation_offer_to_user', function(data){
+        console.log("\nrenegotiation_offer", data)
+        client.broadcast.to(data.targetUser).emit('incoming_renegotiation_offer', {offer: data.offer})
+    })
+
+    client.on('renegotiation_answer_to_user', function(data){
+        console.log("\nrenegotiation_answer", data)
+        client.broadcast.to(data.targetUser).emit('incoming_renegotiation_answer', {answer: data.answer})
     })
 
 
