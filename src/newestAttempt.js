@@ -304,9 +304,15 @@ function App() {
         if (screenShareBtnText === "Start ScreenShare") {
             let tempMyStream = await navigator.mediaDevices.getDisplayMedia()
             myStream.getTracks().forEach((track) => {
-                track.stop()
+                if (track.kind !== "audio") {
+                    track.stop()
+                } else {
+                    tempMyStream.addTrack(track)
+                    track.stop()
+                }
             })
             myStream = tempMyStream
+            console.log(myStream.getTracks())
             setScreenShareBtnText("Start Video")
         } else {
             let tempMyStream = await navigator.mediaDevices.getUserMedia(constraints);
