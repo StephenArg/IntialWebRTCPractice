@@ -29,8 +29,8 @@ io.on('connection', (client) => {
 
     console.log("websocket connected: " + client.id)
     console.log(process.env.PORT, process.env.STUN)
-    
-    client.emit('get_id', {myID: client.id, users: users})
+
+    client.emit('get_id', {myID: client.id, users: users, STUN: process.env.STUN, TURN: process.env.TURN})
     users.push(client.id)
     io.sockets.emit('new_person', users)
 

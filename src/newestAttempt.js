@@ -46,8 +46,13 @@ function App() {
 
         socket.on('get_id', data => {
             console.log("Connected to websocket")
+            if (data.STUN) {
+                pcConfig['iceServers'][0] = data.STUN;
+                pcConfig['iceServers'][1] = data.TURN;
+            }
             setMyID(data.myID)
             setUsers(data.users)
+            console.log("pcConfig", pcConfig)
         })
 
     }, [])
