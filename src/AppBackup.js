@@ -5,7 +5,6 @@ import UserList from './components/UserList'
 // const port = process.env.PORT || 8000;
 
 // console.log(`ws://${window.location.hostname}:${port}`)
-console.log(process.env.STUN)
 var socket = openSocket(window.location.origin.replace(/^http/, 'ws'));
 var peerConnection
 var myStream
@@ -357,37 +356,12 @@ function App() {
 
     }
 
-    const handleGetStats = () => {
-        peerConnection.getStats(null)
-        .then(stats => stats.forEach(obj => {
-            if(obj.type === "candidate-pair" && obj.selected) {
-                console.log(obj);
-                if (obj.candidateType == "relayed") {
-                    console.log("Uses TURN server: " + obj.ipAddress);
-                  } else {
-                    console.log("Does not use TURN (uses " + obj.candidateType + ").");
-                  }
-            }
-        })
-      )
-      peerConnection.getStats(null)
-        .then(stats => stats.forEach(obj => {
-            if(obj.type === "candidate-pair"){
-                console.log(obj)
-            }
-        })
-      )
-
-      console.log(peerConnection)
-    }
-
     return (
         <div className="App">
 
             {users.length > 0 ? <UserList users={users} handleUserClick={handleUserClick}></UserList> : null}
 
             {allowRenegotionation ? <button onClick={handleScreenShare}>{screenShareBtnText}</button> : <button>Welcome!</button>}<br/>
-            <button onClick={handleGetStats}>Get Stats</button><br/>
             
             {remoteLocation && targetUser ? 
             <Fragment>

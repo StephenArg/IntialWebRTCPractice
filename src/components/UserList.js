@@ -4,7 +4,7 @@ export default function UserList(props) {
     const {users, handleUserClick} = props
 
     const listElements = users.map((user) => {
-        return <li onClick={handleUserClick}>{user}</li>
+        return <li key={user} onClick={handleUserClick} style={{cursor: "pointer"}}>{user}</li>
     })
 
     return (
