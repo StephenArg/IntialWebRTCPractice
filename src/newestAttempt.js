@@ -5,7 +5,6 @@ import UserList from './components/UserList'
 // const port = process.env.PORT || 8000;
 
 // console.log(`ws://${window.location.hostname}:${port}`)
-console.log(process.env.STUN)
 var socket = openSocket(window.location.origin.replace(/^http/, 'ws'));
 var peerConnection
 var myStream
@@ -358,6 +357,7 @@ function App() {
     }
 
     const handleGetStats = () => {
+        console.log("STUN server:", process.env.STUN)
         peerConnection.getStats(null)
         .then(stats => stats.forEach(obj => {
             if(obj.type === "candidate-pair" && obj.selected) {
