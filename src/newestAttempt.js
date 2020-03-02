@@ -357,7 +357,6 @@ function App() {
     }
 
     const handleGetStats = () => {
-        console.log("STUN server:", process.env.STUN)
         peerConnection.getStats(null)
         .then(stats => stats.forEach(obj => {
             if(obj.type === "candidate-pair" && obj.selected) {

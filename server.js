@@ -5,6 +5,7 @@ var server = require('http').createServer(app)
 
 var io = require('socket.io')(server)
 const port = process.env.PORT || 8000;
+console.log(process.env.PORT, process.env.STUN)
 
 
 app.use(express.static(path.join(__dirname, './build')))
