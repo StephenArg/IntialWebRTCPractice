@@ -1,7 +1,19 @@
 var path = require('path')
+require('dotenv').config()
 var express = require('express')
 var app = express()
 var server = require('http').createServer(app)
+var accountSid = process.env.SID
+var authToken = process.env.TOKEN
+var twilioClient = require('twilio')(accountSid, authToken)
+var iceServers = [JSON.parse(process.env.STUN), JSON.parse(process.env.TURN)]
+
+twilioClient.tokens.create({ttl: 3600}).then(token => iceServers = token.iceServers)
+
+setInterval(() => {
+    twilioClient.tokens.create({ttl: 3600}).then(token => iceServers = token.iceServers)
+    
+}, 3470000);
 
 var io = require('socket.io')(server)
 const port = process.env.PORT || 8000;
@@ -18,7 +30,6 @@ app.use(express.static(path.join(__dirname, './build')))
 // io.listen(port);
 
 app.get('/', (req, res, next) => {
-    console.log("here")
     res.sendFile(__dirname, './index.html')
 })
 
@@ -28,9 +39,8 @@ io.on('connection', (client) => {
     // here you can start emitting events to the client 
 
     console.log("websocket connected: " + client.id)
-    console.log(process.env.PORT, process.env.STUN)
 
-    client.emit('get_id', {myID: client.id, users: users, STUN: process.env.STUN, TURN: process.env.TURN})
+    client.emit('get_id', {myID: client.id, users: users, iceServers: iceServers})
     users.push(client.id)
     io.sockets.emit('new_person', users)
 

@@ -12,10 +12,7 @@ var streamSenders = []
 var localVideo
 var remoteVideo
 var pcConfig = {
-    'iceServers': [
-      {'urls': 'stun:stun.l.google.com:19302'},
-      {"urls":"turn:numb.viagenie.ca", "username":"webrtc@live.com", "credential":"muazkh"}
-  ]
+    'iceServers': []
   };
 var constraints = { video: true, audio: true };
 var targetUser
@@ -46,11 +43,8 @@ function App() {
 
         socket.on('get_id', data => {
             console.log("Connected to websocket")
-            if (data.STUN) {
-                pcConfig['iceServers'][0] = JSON.parse(data.STUN);
-                if(data.TURN) {
-                    pcConfig['iceServers'][1] = JSON.parse(data.TURN);
-                }
+            if (data.iceServers[0]) {
+                pcConfig['iceServers'] = data.iceServers
             }
             setMyID(data.myID)
             setUsers(data.users)
@@ -373,18 +367,25 @@ function App() {
                   } else {
                     console.log("Does not use TURN (uses " + obj.candidateType + ").");
                   }
+                
+                  if (obj["localCandidateId"]){
+                    console.log("localCandidateId Get", stats.get(obj["localCandidateId"]))
+                }
+                if (obj["remoteCandidateId"]){
+                    console.log("remoteCandidateId Get", stats.get(obj["remoteCandidateId"]));
+                }
             }
         })
       )
-      peerConnection.getStats(null)
-        .then(stats => stats.forEach(obj => {
-            if(obj.type === "candidate-pair"){
-                console.log(obj)
-            }
-        })
-      )
+        peerConnection.getStats(null)
+            .then(stats => stats.forEach(obj => {
+                if(obj.type === "candidate-pair"){
+                    console.log(obj)
+                }
+            })
+        )
 
-      console.log(peerConnection)
+        console.log(peerConnection)
     }
 
     return (
