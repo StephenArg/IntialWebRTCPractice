@@ -39,6 +39,7 @@ io.on('connection', (client) => {
     // here you can start emitting events to the client 
 
     console.log("websocket connected: " + client.id)
+    console.log("logs", process.env.SID, process.env.TOKEN, iceServers)
 
     client.emit('get_id', {myID: client.id, users: users, iceServers: iceServers})
     users.push(client.id)
