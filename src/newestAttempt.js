@@ -12,7 +12,8 @@ var streamSenders = []
 var localVideo
 var remoteVideo
 var pcConfig = {
-    'iceServers': []
+    'iceServers': [{"urls": "stun:stun.l.google.com:19302"},
+    {"urls":"turn:numb.viagenie.ca", "username":"webrtc@live.com", "credential":"muazkh"}]
   };
 var constraints = { video: true, audio: true };
 var targetUser
@@ -43,7 +44,9 @@ function App() {
 
         socket.on('get_id', data => {
             console.log("Connected to websocket")
-            if (data.iceServers[0]) {
+            if (data.iceServers) {
+                data.iceServers.splice(2,2)
+                console.log("iceServers", data.iceServers)
                 pcConfig['iceServers'] = data.iceServers
             }
             setMyID(data.myID)

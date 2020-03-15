@@ -6,13 +6,12 @@ var server = require('http').createServer(app)
 var accountSid = process.env.SID
 var authToken = process.env.TOKEN
 var twilioClient = require('twilio')(accountSid, authToken)
-var iceServers = [JSON.parse(process.env.STUN), JSON.parse(process.env.TURN)]
+var iceServers
 
 twilioClient.tokens.create({ttl: 3600}).then(token => iceServers = token.iceServers)
 
 setInterval(() => {
     twilioClient.tokens.create({ttl: 3600}).then(token => iceServers = token.iceServers)
-    
 }, 3470000);
 
 var io = require('socket.io')(server)
