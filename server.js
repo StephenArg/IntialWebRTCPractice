@@ -6,13 +6,9 @@ var server = require('http').createServer(app)
 var accountSid = process.env.SID
 var authToken = process.env.TOKEN
 var twilioClient = require('twilio')(accountSid, authToken)
-var iceServers
+// var iceServers
 
-twilioClient.tokens.create({ttl: 3600}).then(token => iceServers = token.iceServers)
-
-setInterval(() => {
-    twilioClient.tokens.create({ttl: 3600}).then(token => iceServers = token.iceServers)
-}, 3470000);
+// twilioClient.tokens.create({ttl: 3600}).then(token => iceServers = token.iceServers)
 
 var io = require('socket.io')(server)
 const port = process.env.PORT || 8000;
@@ -32,15 +28,20 @@ app.get('/', (req, res, next) => {
     res.sendFile(__dirname, './index.html')
 })
 
+app.get('/ice_servers', (req, res) => {
+    twilioClient.tokens.create({ttl: 3600}).then(token =>
+    {res.json({iceServers: token.iceServers})})
+  })
+
 var users = []
 
 io.on('connection', (client) => {
     // here you can start emitting events to the client 
 
     console.log("websocket connected: " + client.id)
-    console.log("logs", process.env.SID, process.env.TOKEN, iceServers)
+    console.log("logs", process.env.SID, process.env.TOKEN)
 
-    client.emit('get_id', {myID: client.id, users: users, iceServers: iceServers})
+    client.emit('get_id', {myID: client.id, users: users})
     users.push(client.id)
     io.sockets.emit('new_person', users)
 

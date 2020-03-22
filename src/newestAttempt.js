@@ -2,9 +2,11 @@ import React, { useEffect, useState, Fragment } from 'react';
 import './App.css';
 import openSocket from 'socket.io-client';
 import UserList from './components/UserList'
+import { setInterval } from 'timers';
 // const port = process.env.PORT || 8000;
 
 // console.log(`ws://${window.location.hostname}:${port}`)
+console.log(`${window.location.origin}`)
 var socket = openSocket(window.location.origin.replace(/^http/, 'ws'));
 var peerConnection
 var myStream
@@ -41,17 +43,17 @@ function App() {
             console.log(data)
             const location = data.state ? `${data.state}, ${data.country_name}` : `${data.country_name}`
             myLocation = location})
+        
+        fetchIceServers()
+
+        setInterval(() => {
+            fetchIceServers()
+        }, 3470000)
 
         socket.on('get_id', data => {
             console.log("Connected to websocket")
-            if (data.iceServers) {
-                data.iceServers.splice(2,2)
-                console.log("iceServers", data.iceServers)
-                pcConfig['iceServers'] = data.iceServers
-            }
             setMyID(data.myID)
             setUsers(data.users)
-            console.log("pcConfig", pcConfig)
         })
 
     }, [])
@@ -141,6 +143,18 @@ function App() {
             allowRenegotionationOutsideVar = true
         }
     }, [allowRenegotionation])
+
+    const fetchIceServers = () => {
+        fetch(`${window.location.origin}/ice_servers`)
+        .then(res => res.json())
+        .then(data => {
+            if (data.iceServers) {
+                data.iceServers.splice(3,1)
+                console.log("iceServers", data.iceServers)
+                pcConfig['iceServers'] = data.iceServers
+            }
+        })
+    }
 
     const generateOffer = (renegotiation = false, data = false) => {
         let socketRoute
